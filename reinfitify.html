@@ -105,6 +105,7 @@
           <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
         </button>
       </div>
+      <div class="developer-credit">DEVELOPER : reinF-(Saugat Sapkota)</div>
       <div class="topbar-search">
         <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
         <input class="search-input" placeholder="Search songs, artists…" type="text" />
@@ -127,7 +128,7 @@
           <div class="hero-title">Chill &amp; Focus</div>
           <div class="hero-sub">Your daily dose of focus-friendly music · 48 songs · 3h 12m</div>
           <div class="hero-actions">
-            <button class="btn-play" onclick="playTrack('Chill Wave','Ambient Studio','🌿','#1a3a2e')">
+            <button class="btn-play" onclick="playTrack('Chill Wave','Ambient Studio','🌿','#1a3a2e','247_Dream_LoFi_Chillwave_Vol_01_Luminous_Drift_Studio_256KBPS.mp3')">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               Play
             </button>
@@ -276,7 +277,7 @@
         <div class="prog-track" onclick="seek(event)">
           <div class="prog-fill" id="prog-fill" style="width:0%"></div>
         </div>
-        <span class="time-lbl r">3:20</span>
+        <span class="time-lbl r" id="total-time">3:20</span>
       </div>
     </div>
 

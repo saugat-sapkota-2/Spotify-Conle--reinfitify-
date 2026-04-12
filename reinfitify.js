@@ -17,6 +17,50 @@
   let shuffleOn = false;
   let repeatOn = false;
   const likedTracks = new Set();
+  let playbackMode = 'sim';
+  const audio = new Audio();
+  const heroAudioSrc = '247_Dream_LoFi_Chillwave_Vol_01_Luminous_Drift_Studio_256KBPS.mp3';
+
+  audio.preload = 'metadata';
+
+  function durationToSeconds(value) {
+    const parts = value.split(':').map(Number);
+    if (parts.length !== 2 || Number.isNaN(parts[0]) || Number.isNaN(parts[1])) return 200;
+    return (parts[0] * 60) + parts[1];
+  }
+
+  function formatTime(seconds) {
+    const total = Math.max(0, Math.floor(seconds || 0));
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    return m + ':' + String(s).padStart(2, '0');
+  }
+
+  function stopAudioPlayback() {
+    if (audio.paused && audio.currentTime === 0) return;
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  function startAudioPlayback(src) {
+    const source = src || heroAudioSrc;
+    const resolved = new URL(source, window.location.href).href;
+    if (audio.src !== resolved) {
+      audio.src = source;
+    } else {
+      audio.currentTime = 0;
+    }
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(() => {
+        playbackMode = 'sim';
+        isPlaying = false;
+        updatePlayIcon();
+        document.getElementById('bars').className = 'bars';
+        alert('Add 247_Dream_LoFi_Chillwave_Vol_01_Luminous_Drift_Studio_256KBPS.mp3 to this folder to play audio.');
+      });
+    }
+  }
 
   function renderTracklist() {
     const body = document.getElementById('tracklist-body');
@@ -50,33 +94,55 @@
   }
 
   function playByIdx(idx) {
+    playbackMode = 'sim';
+    stopAudioPlayback();
     currentIdx = idx;
     elapsed = 0;
+    totalSecs = durationToSeconds(tracks[idx].dur);
     isPlaying = true;
     updatePlayer();
     updatePlayIcon();
     startTimer();
     document.getElementById('prog-fill').style.width = '0%';
     document.getElementById('cur-time').textContent = '0:00';
+    document.getElementById('total-time').textContent = tracks[idx].dur;
     document.getElementById('bars').className = 'bars playing';
   }
 
-  function playTrack(title, artist, emoji, bg) {
+  function playTrack(title, artist, emoji, bg, source) {
     const idx = tracks.findIndex(t => t.title === title && t.artist === artist);
     if (idx !== -1) { playByIdx(idx); return; }
+    playbackMode = 'audio';
+    clearInterval(timer);
     document.getElementById('now-art').textContent = emoji;
     document.getElementById('now-art').style.background = bg;
     document.getElementById('now-title').textContent = title;
     document.getElementById('now-artist').textContent = artist;
     elapsed = 0; isPlaying = true;
     updatePlayIcon();
-    startTimer();
     document.getElementById('prog-fill').style.width = '0%';
     document.getElementById('cur-time').textContent = '0:00';
+    document.getElementById('total-time').textContent = '--:--';
     document.getElementById('bars').className = 'bars playing';
+    startAudioPlayback(source);
   }
 
   function togglePlay() {
+    if (playbackMode === 'audio') {
+      if (audio.paused) {
+        const playPromise = audio.play();
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {
+            isPlaying = false;
+            updatePlayIcon();
+            document.getElementById('bars').className = 'bars';
+          });
+        }
+      } else {
+        audio.pause();
+      }
+      return;
+    }
     isPlaying = !isPlaying;
     if (isPlaying) startTimer(); else clearInterval(timer);
     updatePlayIcon();
@@ -109,6 +175,14 @@
     const bar = e.currentTarget;
     const rect = bar.getBoundingClientRect();
     const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    if (playbackMode === 'audio') {
+      if (Number.isFinite(audio.duration) && audio.duration > 0) {
+        audio.currentTime = pct * audio.duration;
+        document.getElementById('prog-fill').style.width = (pct * 100).toFixed(2) + '%';
+        document.getElementById('cur-time').textContent = formatTime(audio.currentTime);
+      }
+      return;
+    }
     elapsed = Math.round(pct * totalSecs);
     document.getElementById('prog-fill').style.width = (pct * 100).toFixed(2) + '%';
     const m = Math.floor(elapsed / 60), s = elapsed % 60;
@@ -123,6 +197,14 @@
   }
 
   function prevTrack() {
+    if (playbackMode === 'audio') {
+      if (audio.currentTime > 4) {
+        audio.currentTime = 0;
+        return;
+      }
+      playByIdx((currentIdx - 1 + tracks.length) % tracks.length);
+      return;
+    }
     if (elapsed > 4) { elapsed = 0; document.getElementById('prog-fill').style.width = '0%'; return; }
     playByIdx((currentIdx - 1 + tracks.length) % tracks.length);
   }
@@ -228,6 +310,45 @@
       if (event.key === 'Escape') {
         closeProfileMenu();
       }
+    });
+
+    audio.addEventListener('play', () => {
+      if (playbackMode !== 'audio') return;
+      isPlaying = true;
+      updatePlayIcon();
+      document.getElementById('bars').className = 'bars playing';
+    });
+
+    audio.addEventListener('pause', () => {
+      if (playbackMode !== 'audio') return;
+      isPlaying = false;
+      updatePlayIcon();
+      document.getElementById('bars').className = 'bars';
+    });
+
+    audio.addEventListener('loadedmetadata', () => {
+      if (playbackMode !== 'audio') return;
+      document.getElementById('total-time').textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (playbackMode !== 'audio') return;
+      const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : 0;
+      const current = audio.currentTime || 0;
+      document.getElementById('cur-time').textContent = formatTime(current);
+      if (duration > 0) {
+        document.getElementById('prog-fill').style.width = ((current / duration) * 100).toFixed(2) + '%';
+      }
+    });
+
+    audio.addEventListener('ended', () => {
+      if (playbackMode !== 'audio') return;
+      if (repeatOn) {
+        audio.currentTime = 0;
+        audio.play();
+        return;
+      }
+      nextTrack();
     });
 
     renderTracklist();

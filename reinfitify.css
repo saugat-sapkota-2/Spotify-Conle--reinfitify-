@@ -192,6 +192,22 @@
   }
   .topbar-btn svg { width: 16px; height: 16px; fill: currentColor; }
   .topbar-btn:hover { background: var(--bg4); color: var(--text); }
+  .developer-credit {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(34, 34, 40, 0.88), rgba(24, 24, 28, 0.88));
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    pointer-events: none;
+  }
   .topbar-search {
     flex: 1;
     max-width: 340px;
@@ -283,6 +299,11 @@
   }
   .profile-menu-item.logout:hover {
     color: #ffd2d2;
+  }
+  @media (max-width: 1180px) {
+    .developer-credit {
+      display: none;
+    }
   }
   .hero {
     padding: 28px 28px 0;
