@@ -3,6 +3,14 @@
 A modern, single-page music player inspired by streaming app layouts, built with plain HTML, CSS, and JavaScript.
 
 <p align="center">
+  <img src="image.png" alt="Reinfitify UI Preview" width="95%" />
+</p>
+
+<p align="center">
+  <strong>Immersive music UI preview</strong>
+</p>
+
+<p align="center">
   <strong style="font-size: 18px;">DEVELOPER</strong><br />
   <strong style="font-size: 20px; letter-spacing: 0.4px;">reinF-(Saugat Sapkota)</strong>
 </p>
@@ -14,6 +22,10 @@ A modern, single-page music player inspired by streaming app layouts, built with
 Reinfitify is a front-end music experience focused on visual polish and interactive controls without any build tools or frameworks. It includes a sidebar library, dynamic sections, track interactions, an interactive bottom player, profile dropdown actions, and local audio playback support.
 
 The interface is designed to feel app-like while still running as a lightweight static project.
+
+<p align="center">
+  <img src="image.png" alt="Reinfitify Screenshot" width="88%" />
+</p>
 
 ## Key Features
 
@@ -50,6 +62,7 @@ reinfitify/
 |-- reinfitify.html
 |-- reinfitify.css
 |-- reinfitify.js
+|-- image.png
 |-- 247_Dream_LoFi_Chillwave_Vol_01_Luminous_Drift_Studio_256KBPS.mp3
 |-- README.md
 ```
